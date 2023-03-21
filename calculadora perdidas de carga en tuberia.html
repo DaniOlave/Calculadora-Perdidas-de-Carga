@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>Calculadora perdidas en cañerias</title>
+  </head>
+
+  <body>
+
+    <h1>Calculadora de perdidas por fricción en una cañería</h1>
+
+    <h2>Sobre las perdidas por friccion en tuberias</h2>
+
+    <div class="grid-layout">
+      
+    <p class="caja1">
+      Las perdidas de carga en una tubería se dan por efecto de los esfuerzos de corte que actuan sobre el fluido.<br>
+      Para calcularse las perdidas por fricción se usa la ecuación de Darcy-Weisbach:
+    </p>
+
+    <br>
+
+    <img class="caja2 " src="Ecuacion de darcy.png" alt="Ecuacion de Darcy-Weisbach">
+
+    <img class="caja3" src="leyenda ecuacion de darcy.png" alt="leyenda ecuacion de Darcy-Weisbach">
+
+    <br>
+
+    <p class="caja1">
+      El factor f, depende de la rugosidad de la cañería y del régimen en el que el fluido circula. Se determina de manera empírica, y sus valores se encuentran en gráficos como el diagrama de Moody.<br>Esta calculadora emplea la correlación de Colebrook-White para calcular f.  
+    </p>
+
+    <br>
+
+    <img class="caja2" src="correlacion de colebrook.png" alt="Ecuacion de colebrook">
+
+    <img class="caja3" src="leyenda ecuacion de colebrook.png" alt="leyenda ecuacion de colebrook">
+
+    <br>
+
+    <p class="caja1">
+      Los cambios de dirección del fluido, o su paso a través de accesorios produce una perdida de carga adicional, esta puede cuantificarse en términos de metros de cañería recta adicionales. <br>
+      La longitud equivalente de cada accesorio se determina de manera empírica, y suele brindarla el proveedor del accesorio, sin embargo existen en bibliografía longitudes equivalentes para accesorios comunes.  
+    </p>
+
+    <br>
+
+
+
+    <br>
+    <br>
+    
+
+    
+    <div class="caja1">
+      <h2>Calculadora</h2>
+      introduce los valores en unidades del SI. Presta especial atencion a la viscosidad, que debe estar expresada en Pa.s, y a la rugosidad absoluta, que debe estar en m.
+      <br>
+      <br>
+
+    </div>
+
+
+
+
+
+    <div class="datosFluido">
+      Datos del fluido <br>
+      <input type="text" name="densidad" placeholder="densidad" id="input-densidad"  />
+      <input type="text" name="viscosidad" placeholder="viscosidad" id="input-viscosidad"  />
+      <input type="text" name="velosidad" placeholder="velosidad" id="input-velosidad"  />
+    </div>
+
+
+    <div class="datosCañeria">
+      Datos de la cañeria <br>
+      <input type="text" name="diametro" placeholder="diametro" id="input-diametro"  />
+      <input type="text" name="rugosidad" placeholder="rugosidad" id="input-rugosidad"  />
+      <input type="text" name="longitudCañeria" placeholder="longitud de cañeria" id="input-longitud"  />
+    </div>
+
+
+    <div class="accesorios">
+      Accesorios <br>
+      <input type="text" name="codos90" placeholder="numero de codos de 90°" id="input-codos90"  />
+      <input type="text" name="empalmes180" placeholder="numero de empalmes 180°" id="input-empalmes180"  />
+      <input type="text" name="embocaduras" placeholder="numero de embocaduras" id="input-embocaduras"  />
+      <input type="text" name="desembocaduras" placeholder="numero de desembocaduras" id="input-desembocaduras"  />
+
+    </div>
+
+
+          
+    <div class="datos-calculados">
+
+    Numero de Reynold
+      <div id="Reynold">
+              
+      </div>
+    Factor de friccion
+      <div id="FactorFriccion">
+        
+      </div>
+    Potencia perdida
+      <div id="PotenciaPerdida">
+        
+      </div>
+
+    </div>
+
+      <input  class="buton" type="button" value="Calcular Re" onclick="calcularRe()">
+
+      <input  class="buton" type="button" value="Calcular f" onclick="calcularf()">
+
+      <input  class="buton" type="button" value="Calcular longitud total" onclick="calcLongEqTot()">
+
+      <input  class="buton" type="button" value="Calcular potencia perdida" onclick="calcularWu()">
+
+
+    </div>
+
+    
+  
+  </body>
+
+    
+  <script>
+    var densidad = document.getElementById("input-densidad").value;
+    var velosidad = document.getElementById("input-velosidad").value;
+    var diametro = document.getElementById("input-diametro").value;
+    var viscosidad = document.getElementById("input-viscosidad").value;
+
+    var longitudCañeria = document.getElementById("input-longitud").value;
+
+    var ε = document.getElementById("input-rugosidad").value; /*ε = rugosidad*/
+    var Reynold = 1;
+
+    var εr = ε/diametro;
+    var f = 1;
+
+    function calcularRe() {
+        densidad = document.getElementById("input-densidad").value;
+        velosidad = document.getElementById("input-velosidad").value;
+        diametro = document.getElementById("input-diametro").value;
+        viscosidad = document.getElementById("input-viscosidad").value;
+        
+        Reynold = densidad * velosidad * diametro / viscosidad;
+        
+        console.log ("Reynold" + Reynold);
+        document.getElementById("Reynold").innerHTML = Reynold;
+
+        return Reynold;
+    }
+
+    function calcularf() {
+
+      ε = document.getElementById("input-rugosidad").value;
+      diametro = document.getElementById("input-diametro").value;
+      εr = ε/diametro;
+
+      if (Reynold <= 2000) {
+        f = 64/Re ;
+      } else {
+
+        f2 = 0.001; /* f2 es un valor supuesto para iniciar una iteracion */
+        a = εr/3.70; 
+        b = 2.51/(Reynold*Math.pow(f2,0.5));
+        k = -2*Math.log10(a+b); 
+        f = Math.pow((1/k),2);
+      
+          while (Math.abs(f2-f)>0.0001) {
+            f2=f;        
+            a = εr/3.70; 
+            b = 2.51/(Reynold*Math.pow(f2,0.5));
+            k = -2*Math.log10(a+b); 
+            f = Math.pow((1/k),2);   
+          }
+        }  
+
+    document.getElementById("FactorFriccion").innerHTML = f;
+    return f; 
+    }
+
+    var areaCañeria = Math.PI*Math.pow(diametro,2)/4;
+    var caudalMasico = densidad*velosidad*areaCañeria;
+
+    /*ACCESORIOS*/
+
+    var numCodos90 = 0;
+
+    var numEmpalmes180 = 0;
+
+    var numEmbocadura = 0;
+
+    var numDesembocadura = 0;
+
+    /*LONGITUD EQUIVALENTE DE CADA ACCESORIO*/
+      var longEqCodo90 = 1.8*(diametro/.0254)+0.213;
+
+      var longEqEmpalme180 = 2*(diametro/.0254);
+
+      var longEqEmbocadura = 0.5*(diametro/.0254);
+
+      var longEqDesembocadura = 2*(diametro/.0254);
+
+      var longitudCañeria = 0;
+
+    
+
+    /*Longitud Total*/
+
+    var longitudEqTot = 0;
+
+    function calcLongEqTot() {     
+      longEqCodo90 = 1.8*(diametro/.0254)+0.213;
+
+      longEqEmpalme180 = 2*(diametro/.0254);
+
+      longEqEmbocadura = 0.5*(diametro/.0254);
+
+      longEqDesembocadura = 2*(diametro/.0254);
+
+      longitudCañeria = parseInt(document.getElementById("input-longitud").value);
+
+      numCodos90 = parseInt(document.getElementById("input-codos90").value);
+
+      numEmpalmes180 = parseInt(document.getElementById("input-empalmes180").value);
+
+      numEmbocadura = parseInt(document.getElementById("input-embocaduras").value);
+
+      numDesembocadura = parseInt(document.getElementById("input-desembocaduras").value);
+
+      longitudEqTot = longitudCañeria+numCodos90*longEqCodo90+numEmpalmes180*longEqEmpalme180+numEmbocadura*longEqEmbocadura+numDesembocadura*longEqDesembocadura;
+      
+      return longitudEqTot;
+    }
+    
+      var PotenciaPerdida = 0;
+
+    function calcularWu() {
+      areaCañeria = Math.PI*Math.pow(diametro,2)/4;
+      caudalMasico = densidad*velosidad*areaCañeria;
+      PotenciaPerdida = caudalMasico * f * longitudEqTot/diametro * Math.pow(velosidad,2)/2;
+      document.getElementById("PotenciaPerdida").innerHTML = PotenciaPerdida;
+      return PotenciaPerdida;
+
+    }
+
+
+
+      
+    
+
+    calcularRe();
+    calcularf();
+    calcLongEqTot();
+    calcularWu();
+    
+
+    
+  </script>
+
+  </body>
+</html>
